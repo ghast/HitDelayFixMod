@@ -1,0 +1,9 @@
+{
+  "required": true,
+  "package": "io.ghast.hitdelayfix.mixins",
+  "refmap": "mixins.hitdelayfix.refmap.json",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "MixinMinecraft"
+  ]
+}
