@@ -1,6 +1,7 @@
 package io.ghast.hitdelayfix.commands;
 
 import io.ghast.hitdelayfix.HitDelayFix;
+import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
@@ -10,7 +11,7 @@ import net.minecraft.util.ChatComponentText;
 import java.util.Collections;
 import java.util.List;
 
-public class HitDelayDebugCommand implements ICommand {
+public class HitDelayDebugCommand extends CommandBase {
     @Override
     public String getCommandName() {
         return "hitdelaydebug";
@@ -27,7 +28,7 @@ public class HitDelayDebugCommand implements ICommand {
     }
 
     @Override
-    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
+    public void processCommand(ICommandSender sender, String[] args) {
         if (args.length != 1 || (!args[0].equalsIgnoreCase("off") && !args[0].equalsIgnoreCase("on") && !args[0].equalsIgnoreCase("reset"))) {
             sender.addChatMessage(new ChatComponentText("Invalid Arguments."));
             return;
@@ -46,22 +47,7 @@ public class HitDelayDebugCommand implements ICommand {
     }
 
     @Override
-    public boolean canCommandSenderUseCommand(ICommandSender sender) {
-        return true;
-    }
-
-    @Override
-    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
-        return null;
-    }
-
-    @Override
-    public boolean isUsernameIndex(String[] args, int index) {
-        return false;
-    }
-
-    @Override
-    public int compareTo(ICommand o) {
-        return 0;
+    public int getRequiredPermissionLevel() {
+        return -1;
     }
 }
