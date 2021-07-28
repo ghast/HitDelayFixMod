@@ -14,7 +14,7 @@ public class MixinMinecraft {
     @Shadow private int leftClickCounter;
 
     @Inject(method = "clickMouse", at = @At("HEAD"))
-    private void clickMouseAfter(final CallbackInfo ci) {
+    private void clickMouseAfter(CallbackInfo ci) {
         leftClickCounter = 0;
     }
 }

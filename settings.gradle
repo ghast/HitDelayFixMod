@@ -1,0 +1,26 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+        maven {
+            name = "sonatype"
+            url = "https://oss.sonatype.org/content/repositories/snapshots"
+        }
+        maven { url "https://maven.minecraftforge.net/" }
+        maven { url "https://jitpack.io" }
+    }
+    resolutionStrategy {
+        eachPlugin {
+            // If the "net.minecraftforge.gradle.forge" plugin is requested we redirect it to asbyth's ForgeGradle fork
+            if (requested.id.id == "net.minecraftforge.gradle.forge") {
+                useModule("com.github.Skytils:ForgeGradle:${requested.version}")
+            }
+            //The same thing but for MixinGradle
+            if (requested.id.id == "org.spongepowered.mixin") {
+                useModule("com.github.Skytils:mixingradle:${requested.version}")
+            }
+        }
+    }
+}
+
+rootProject.name = "HitDelayFix"

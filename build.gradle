@@ -1,139 +1,107 @@
-buildscript {
-    repositories {
-        jcenter()
-        maven {
-            name = "forge"
-            url = "http://files.minecraftforge.net/maven"
-        }
-
-        maven {
-            name = 'SpongePowered'
-            url = 'https://repo.spongepowered.org/repository/maven-public/'
-        }
-        maven {
-            name = "JitPack"
-            url = "https://jitpack.io/"
-        }
-    }
-    dependencies {
-        classpath "com.github.Skytils:ForgeGradle:86b23926f3"
-        classpath 'com.github.LxGaming:MixinGradle:0.6-SNAPSHOT'
-        classpath 'com.github.jengelman.gradle.plugins:shadow:6.1.0'
-    }
-}
-
-repositories {
-
-    mavenLocal()
-    mavenCentral()
-    jcenter()
-
-    maven {
-        name = 'spongepowered-repo'
-        url = 'https://repo.spongepowered.org/repository/maven-public/'
-    }
-}
-
-apply plugin: 'net.minecraftforge.gradle.forge'
-apply plugin: 'org.spongepowered.mixin'
-apply plugin: 'com.github.johnrengelman.shadow'
-apply plugin: 'java'
-
-
-/*
-// for people who want stable - not yet functional for MC 1.8.8 - we require the forgegradle 2.1 snapshot
 plugins {
-    id "net.minecraftforge.gradle.forge" version "2.0.2"
+    id "java"
+    id "com.github.johnrengelman.shadow" version "6.1.0"
+    id "net.minecraftforge.gradle.forge" version "6f5327"
+    id "org.spongepowered.mixin" version "d5f9873d60"
 }
-*/
+
 version = "1.0"
-group= "io.ghast.hitdelayfix" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "hitdelayfix"
+group = "io.ghast"
+archivesBaseName = "HitDelayFix"
 
-
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = targetCompatibility = 1.8
 compileJava.options.encoding = 'UTF-8'
 
 minecraft {
     version = "1.8.9-11.15.1.2318-1.8.9"
     runDir = "run"
-
-    // the mappings can be changed at any time, and must be in the following format.
-    // snapshot_YYYYMMDD   snapshot are built nightly.
-    // stable_#            stables are built at the discretion of the MCP team.
-    // Use non-default mappings at your own risk. they may not allways work.
-    // simply re-run your setup task after changing the mappings to update your workspace.
     mappings = "stable_22"
-    makeObfSourceJar = true
-
-    // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+    makeObfSourceJar = false
+    clientJvmArgs += "-Dfml.coreMods.load=io.ghast.hitdelayfix.MixinLoader"
+    clientRunArgs += "--tweakClass org.spongepowered.asm.launch.MixinTweaker"
+    clientRunArgs += "--mixin mixins.hitdelayfix.json"
 }
 
 configurations {
-    mods
-    shade
-    compile.extendsFrom shade
+    // Creates an extra configuration that implements `implementation` to be used later as the configuration that shades libraries
+    include
+    implementation.extendsFrom(include)
+}
+
+repositories {
+    mavenCentral()
+    maven { url "https://repo.spongepowered.org/repository/maven-public/" }
+    maven {
+        name = "Jitpack"
+        url = "https://jitpack.io/"
+    }
 }
 
 dependencies {
-    compile('org.spongepowered:mixin:0.7.11-SNAPSHOT') {
-        exclude module: 'launchwrapper'
-        exclude module: 'guava'
-        exclude module: 'gson'
-        exclude module: 'commons-io'
-    }
+    include 'org.spongepowered:mixin:0.7.11-SNAPSHOT'
+    annotationProcessor 'org.spongepowered:mixin:0.7.11-SNAPSHOT'
 }
 
 mixin {
+    disableRefMapWarning = true
+    defaultObfuscationEnv searge
     add sourceSets.main, "mixins.hitdelayfix.refmap.json"
 }
 
-shadowJar {
-    dependencies {
-        include(dependency('org.spongepowered:mixin:0.7.11-SNAPSHOT'))
-    }
-
-    exclude('LICENSE.txt')
-    exclude('dummyThing')
-    classifier = 'full'
-}
-
-build.dependsOn(shadowJar)
-
-apply plugin: "idea"
-
-idea {
-    module {
-        inheritOutputDirs = true
-    }
-}
-
 jar {
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
     manifest.attributes(
-            "MixinConfigs": 'mixins.hitdelayfix.json',
-            "tweakClass": 'org.spongepowered.asm.launch.MixinTweaker',
-            "TweakOrder": 0,
-            "FMLCorePlugin": 'io.ghast.hitdelayfix.MixinLoader',
+            "FMLCorePlugin": "io.ghast.hitdelayfix.MixinLoader",
+            "FMLCorePluginContainsFMLMod": true,
+            "ForceLoadAsMod": true,
+            "MixinConfigs": "mixins.hitdelayfix.json",
+            "ModSide": "CLIENT",
+            "TweakClass": "org.spongepowered.asm.launch.MixinTweaker"
     )
 }
 
-processResources
-        {
-            // this will ensure that this task is redone when the versions change.
-            inputs.property "version", project.version
-            inputs.property "mcversion", project.minecraft.version
+/**
+ * This task simply replaces the `${version}` and `${mcversion}` properties in the mcmod.info with the data from Gradle
+ */
+processResources {
+    // this will ensure that this task is redone when the versions change.
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
 
-            // replace stuff in mcmod.info, nothing else
-            from(sourceSets.main.resources.srcDirs) {
-                include 'mcmod.info'
+    // replace stuff in mcmod.info, nothing else
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
 
-                // replace version and mcversion
-                expand 'version':project.version, 'mcversion':project.minecraft.version
-            }
+        // replace version and mcversion
+        expand 'version': project.version, 'mcversion': project.minecraft.version
+    }
 
-            // copy everything else, thats not the mcmod.info
-            from(sourceSets.main.resources.srcDirs) {
-                exclude 'mcmod.info'
-            }
-        }
+    // copy everything else, thats not the mcmod.info
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
+
+/**
+ * This task simply moves resources so they can be accessed at runtime, Forge is quite weird isn't it
+ */
+task moveResources {
+    doLast {
+        ant.move file: "${buildDir}/resources/main",
+                todir: "${buildDir}/classes/java"
+    }
+}
+
+moveResources.dependsOn processResources
+classes.dependsOn moveResources
+
+// This adds support to ("embed", "shade", "include") libraries into our JAR
+shadowJar {
+    archiveClassifier.set('')
+    configurations = [project.configurations.include]
+    duplicatesStrategy DuplicatesStrategy.EXCLUDE
+}
+
+jar.dependsOn shadowJar
