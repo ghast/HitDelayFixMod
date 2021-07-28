@@ -103,5 +103,4 @@ shadowJar {
     configurations = [project.configurations.include]
     duplicatesStrategy DuplicatesStrategy.EXCLUDE
 }
-
-jar.dependsOn shadowJar
+tasks.build.dependsOn(tasks.shadowJar)
