@@ -1,10 +1,8 @@
 {
-  "required": true,
-  "package": "io.ghast.hitdelayfix.mixins",
-  "refmap": "mixins.hitdelayfix.refmap.json",
+  "package": "${basePackage}.${modid}.mixin",
+  "plugin": "${basePackage}.${modid}.init.AutoDiscoveryMixinPlugin",
+  "refmap": "mixins.${modid}.refmap.json",
+  "minVersion": "0.7",
   "compatibilityLevel": "JAVA_8",
-  "mixins": [
-    "MixinMinecraft",
-    "MixinWorldClient"
-  ]
+  "__comment": "You do not need to manually register mixins in this template. Check the auto discovery mixin plugin for more info."
 }
