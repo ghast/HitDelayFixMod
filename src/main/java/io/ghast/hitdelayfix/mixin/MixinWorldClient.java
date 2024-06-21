@@ -1,4 +1,4 @@
-package io.ghast.hitdelayfix.mixins;
+package io.ghast.hitdelayfix.mixin;
 
 import io.ghast.hitdelayfix.HitDelayFix;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -9,7 +9,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(WorldClient.class)
 public class MixinWorldClient {
-
 
     @Inject(method = "sendQuittingDisconnectingPacket", at = @At("HEAD"))
     public void sendQuittingDisconnectingPacket(CallbackInfo ci) {

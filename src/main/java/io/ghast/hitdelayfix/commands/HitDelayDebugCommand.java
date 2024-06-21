@@ -1,7 +1,6 @@
 package io.ghast.hitdelayfix.commands;
 
 import io.ghast.hitdelayfix.HitDelayFix;
-import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.BlockPos;
@@ -18,7 +17,7 @@ public class HitDelayDebugCommand implements ICommand {
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return null;
+        return "Usage: /hitdelaydebug <on/off/reset>";
     }
 
     @Override
@@ -27,9 +26,9 @@ public class HitDelayDebugCommand implements ICommand {
     }
 
     @Override
-    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
+    public void processCommand(ICommandSender sender, String[] args) {
         if (args.length != 1 || (!args[0].equalsIgnoreCase("off") && !args[0].equalsIgnoreCase("on") && !args[0].equalsIgnoreCase("reset"))) {
-            sender.addChatMessage(new ChatComponentText("Invalid Arguments."));
+            sender.addChatMessage(new ChatComponentText("Invalid Arguments. Usage: /hitdelaydebug <on/off/reset>"));
             return;
         }
 
@@ -41,8 +40,7 @@ public class HitDelayDebugCommand implements ICommand {
 
         HitDelayFix.INSTANCE.affectedAttackCounter.setEnabled(args[0].equalsIgnoreCase("on"));
 
-        sender.addChatMessage(new ChatComponentText(String.format("HitDelayFix debugging has been %s.",
-                HitDelayFix.INSTANCE.affectedAttackCounter.isEnabled() ? "enabled" : "disabled")));
+        sender.addChatMessage(new ChatComponentText(String.format("HitDelayFix debugging has been %s.", HitDelayFix.INSTANCE.affectedAttackCounter.isEnabled() ? "enabled" : "disabled")));
     }
 
     @Override
